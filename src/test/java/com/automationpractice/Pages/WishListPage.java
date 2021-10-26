@@ -1,26 +1,19 @@
-package com.automationpractice;
+package com.automationpractice.Pages;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class WishListPage extends BasicPage {
-    private final WebDriver driver;
     private final List<String> names = new ArrayList<>();
     private final List<Integer> qntOfItems = new ArrayList<>();
-
-    public WishListPage() {
-        this.driver = DRIVER;
-        PageFactory.initElements(driver, this);
-    }
+    private final By tableRows = By.xpath("//tbody/tr");
 
     @FindBy(id = "name")
     private WebElement wishListName;
@@ -57,7 +50,7 @@ public class WishListPage extends BasicPage {
     }
 
     public WishListPage removeWishLists() {
-        List<WebElement> allRows = driver.findElements(By.xpath("//tbody/tr"));
+        List<WebElement> allRows = driver.findElements(tableRows);
         for (WebElement element : allRows) {
             removeWishListButton.click();
             Alert alert = driver.switchTo().alert();
@@ -67,10 +60,8 @@ public class WishListPage extends BasicPage {
     }
 
     public List<String> getWishListNames() {
-        List<WebElement> allRows = driver.findElements(By.xpath("//tbody/tr"));
-        for (WebElement element : allRows) {
-            names.add(createdWishListName.getText());
-        }
+        List<WebElement> allRows = driver.findElements(tableRows);
+        allRows.forEach(element -> names.add(createdWishListName.getText()));
         return names;
     }
 
@@ -79,10 +70,8 @@ public class WishListPage extends BasicPage {
     }
 
     public List<Integer> getWishListsItemsQnt() {
-        List<WebElement> allRows = driver.findElements(By.xpath("//tbody/tr"));
-        for (WebElement element : allRows) {
-            qntOfItems.add(Integer.parseInt(addedItemsQnt.getText()));
-        }
+        List<WebElement> allRows = driver.findElements(tableRows);
+        allRows.forEach(element -> names.add(addedItemsQnt.getText()));
         return qntOfItems;
     }
 

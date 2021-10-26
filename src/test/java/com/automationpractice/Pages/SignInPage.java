@@ -1,4 +1,4 @@
-package com.automationpractice;
+package com.automationpractice.Pages;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebElement;
@@ -24,7 +24,7 @@ public class SignInPage extends BasicPage {
 
     @Step("Open sign in page")
     public SignInPage openSignInPage() {
-        DRIVER.get(URL);
+        driver.get(URL);
         return this;
     }
 

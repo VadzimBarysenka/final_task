@@ -1,4 +1,4 @@
-package com.automationpractice;
+package com.automationpractice.Pages;
 
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebElement;
@@ -15,10 +15,10 @@ public class ProductDetailPage extends BasicPage {
     @FindBy(id = "our_price_display")
     private WebElement itemPrice;
 
-    @FindBy(xpath = "//span[@title=\"Continue shopping\"]")
+    @FindBy(xpath = "//span[@title='Continue shopping']")
     private WebElement continueShoppingButton;
 
-    @FindBy(xpath = "//a[@class=\"fancybox-item fancybox-close\"]")
+    @FindBy(xpath = "//a[@class='fancybox-item fancybox-close']")
     private WebElement closePopUpButton;
 
     @Step("Add product to cart and continue")

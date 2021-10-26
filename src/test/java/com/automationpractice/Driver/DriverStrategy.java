@@ -1,4 +1,4 @@
-package com.automationpractice;
+package com.automationpractice.Driver;
 
 import org.openqa.selenium.WebDriver;
 

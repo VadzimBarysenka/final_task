@@ -1,5 +1,6 @@
-package com.automationpractice;
+package com.automationpractice.Pages;
 
+import com.automationpractice.Driver.WebDriverSingleton;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -10,31 +11,41 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class BasicPage {
-    protected final WebDriver DRIVER;
+import java.util.Locale;
 
-    public BasicPage() {
-        this.DRIVER = WebDriverSingleton.getInstance().getDriver(WebDriverSingleton.Browsers.FIREFOX);
-        PageFactory.initElements(DRIVER, this);
+public class BasicPage {
+    protected final WebDriver driver;
+
+    enum Category {
+        WOMEN,
+        DRESS,
+        T_SHIRTS
     }
 
-    @FindBy(xpath = "//a[@class=\"account\"]")
+    private final By overlay = By.xpath("//div[contains(@class, 'fancybox-overlay')]");
+
+    @FindBy(xpath = "//a[@class='account']")
     private WebElement openAccount;
 
     @FindBy(className = "logout")
     private WebElement logout;
 
-    @FindBy(xpath = "//a[@title=\"View my shopping cart\"]")
+    @FindBy(xpath = "//a[@title='View my shopping cart']")
     private WebElement shopCart;
 
-    @FindBy(xpath = "//li[3]/a[@title=\"T-shirts\"]")
+    @FindBy(xpath = "//li/following-sibling::li/a[@title='T-shirts']")
     private WebElement shirtsBlock;
 
-    @FindBy(xpath = "//div[@id=\"block_top_menu\"]/ul/li[2]/a[@title=\"Dresses\"]")
+    @FindBy(xpath = "//div[@id='block_top_menu']/ul/li/a[@title='Dresses']")
     private WebElement dressBlock;
 
-    @FindBy(xpath = "//a[@title=\"Women\"]")
+    @FindBy(xpath = "//a[@title='Women']")
     private WebElement womenBlock;
+
+    public BasicPage() {
+        this.driver = WebDriverSingleton.getInstance().getDriver();
+        PageFactory.initElements(driver, this);
+    }
 
     public String getCustomerName() {
         return openAccount.getText();
@@ -46,8 +57,8 @@ public class BasicPage {
 
     @Step("Open [Account] page")
     public AccountPage openAccountPage() {
-        WebDriverWait wait = new WebDriverWait(DRIVER, 10);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//div[contains(@class, \"fancybox-overlay\")]")));
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(overlay));
         openAccount.click();
         return new AccountPage();
     }
@@ -66,15 +77,16 @@ public class BasicPage {
 
     @Step("Open category")
     public ProductsPage openCategory(String category) {
-        switch (category) {
-            case "women":
+        switch (Category.valueOf(category.toUpperCase(Locale.ROOT))) {
+            case WOMEN:
                 womenBlock.click();
                 break;
-            case "dress":
+            case DRESS:
                 dressBlock.click();
                 break;
-            case "t-shirts":
+            case T_SHIRTS:
                 shirtsBlock.click();
+                break;
         }
         return new ProductsPage();
     }

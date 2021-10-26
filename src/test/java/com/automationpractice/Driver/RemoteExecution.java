@@ -1,4 +1,4 @@
-package com.automationpractice;
+package com.automationpractice.Driver;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -19,7 +19,6 @@ public class RemoteExecution implements DriverStrategy {
                 capability.setCapability("platform", "Windows 10");
                 capability.setCapability("version", "latest");
                 capability.setCapability("screenResolution", "1280x1024");
-                //this.driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capability);
                 this.driver = new RemoteWebDriver(new URL("https://oauth-vdmbrs90-1721b:44d764e1-e001-42c3-a0c0-098ec115a847@ondemand.eu-central-1.saucelabs.com:443/wd/hub"), capability);
             } catch (MalformedURLException e) {
                 e.printStackTrace();

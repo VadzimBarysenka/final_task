@@ -1,5 +1,10 @@
 package com.automationpractice;
 
+import com.automationpractice.Driver.WebDriverSingleton;
+import com.automationpractice.Pages.AccountPage;
+import com.automationpractice.Pages.SignInPage;
+import com.automationpractice.Pages.WishListPage;
+import com.automationpractice.TestListener.TestListener;
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
 import io.qameta.allure.TmsLink;
@@ -11,21 +16,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 //@Execution(ExecutionMode.CONCURRENT)
 @DisplayName("Wishlist functionality")
-@ExtendWith(ScreenShot.class)
+@ExtendWith(TestListener.class)
 public class WishListTest {
-    private static BasicPage basicPage;
-    private static SignInPage signInPage;
-    private static WishListPage wishListPage;
+    private AccountPage accountPage;
+    private SignInPage signInPage;
+    private WishListPage wishListPage;
     private final static String USER_EMAIL = "testo@mail.com";
     private final static String USER_PASSWORD = "!QAZxsw2";
     private final static String AUTO_CREATED_LIST_NAME = "My wishlist";
     private final static String CREATED_LIST_NAME = RandomStringUtils.randomAlphabetic(8);
 
-    @BeforeAll
-    public static void setup() {
-        basicPage = new BasicPage();
-        signInPage = new SignInPage();
-        wishListPage = new WishListPage();
+    @BeforeEach
+    public void setup() {
     }
 
     @AfterAll
@@ -35,8 +37,9 @@ public class WishListTest {
 
     @AfterEach
     public void cleanListAndLogOut() {
+        wishListPage = new WishListPage();
         wishListPage.removeWishLists();
-        basicPage.logout();
+        wishListPage.logout();
     }
 
     @Story("Add product to wishlist")
@@ -45,14 +48,15 @@ public class WishListTest {
     @TmsLink("ID-104")
     @Test
     public void addToAutoCreatedWishList() {
-        signInPage.openSignInPage()
-                .fillEmailAndPassword(USER_EMAIL, USER_PASSWORD)
-                .logInToApp()
-                .openWishLists();
+        signInPage = new SignInPage();
+        wishListPage = new WishListPage();
+
+        accountPage = signInPage.openSignInPage().fillEmailAndPassword(USER_EMAIL, USER_PASSWORD).logInToApp();
+        wishListPage = accountPage.openWishLists();
 
         assertTrue(wishListPage.verifyAbsentOfWishLists());
 
-        basicPage.openCategory("dress")
+        wishListPage.openCategory("DRESS")
                 .openProductDetailPage(2)
                 .addItemToWishList()
                 .openAccountPage()
@@ -70,19 +74,22 @@ public class WishListTest {
     @TmsLink("ID-104")
     @Test
     public void addToCreatedWishListTest() {
+        signInPage = new SignInPage();
+        wishListPage = new WishListPage();
+
         signInPage.openSignInPage()
                 .fillEmailAndPassword(USER_EMAIL, USER_PASSWORD)
                 .logInToApp()
                 .openWishLists()
                 .createWishList(CREATED_LIST_NAME)
-                .openCategory("dress")
+                .openCategory("DRESS")
                 .openProductDetailPage(5)
                 .addItemToWishList()
                 .openAccountPage()
                 .openWishLists();
 
         assertAll(
-                () -> assertEquals(CREATED_LIST_NAME, wishListPage.getWishListName()),
+                () -> assertEquals(CREATED_LIST_NAME, wishListPage.getWishListNames()),
                 () -> assertEquals(1, wishListPage.getWishListItemQnt())
         );
     }

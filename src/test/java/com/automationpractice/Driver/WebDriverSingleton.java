@@ -1,4 +1,4 @@
-package com.automationpractice;
+package com.automationpractice.Driver;
 
 import org.openqa.selenium.WebDriver;
 
@@ -19,11 +19,9 @@ public class WebDriverSingleton {
 
     public WebDriver getDriver() {
         if (driver == null) {
-            if (System.getProperty("remote") == null) {
-                driverStrategy = new LocalExecution();
-            } else {
-                driverStrategy = new RemoteExecution();
-            }
+            driverStrategy = (System.getProperty("remote") == null)
+                    ? new LocalExecution()
+                    : new RemoteExecution();
             driver = driverStrategy.startDriver();
         }
         return driver;

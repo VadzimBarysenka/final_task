@@ -1,5 +1,10 @@
 package com.automationpractice;
 
+import com.automationpractice.Driver.WebDriverSingleton;
+import com.automationpractice.Pages.RegistrationPage;
+import com.automationpractice.Pages.SignInPage;
+import com.automationpractice.TestListener.TestListener;
+import com.automationpractice.Users.RegistrationUser;
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
 import io.qameta.allure.TmsLink;
@@ -12,10 +17,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //@Execution(ExecutionMode.CONCURRENT)
 @DisplayName("Account creation and and login")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ExtendWith(ScreenShot.class)
+@ExtendWith(TestListener.class)
 public class LoginTest {
-    private static SignInPage signInPage;
-    private static AccountPage accountPage;
+    private SignInPage signInPage;
+    private RegistrationUser registrationUser;
+    private RegistrationPage registrationPage;
     private final static String USER_EMAIL = "testo@mail.com";
     private final static String USER_PASSWORD = "!QAZxsw2";
     private final static String USER_NAME = "test test";
@@ -27,20 +33,20 @@ public class LoginTest {
     private final static String CUSTOMER_CITY = RandomStringUtils.randomAlphanumeric(5);
     private final static String CUSTOMER_POST_CODE = RandomStringUtils.randomNumeric(5);
     private final static String CUSTOMER_PHONE_MOBILE = RandomStringUtils.randomNumeric(7);
+    private final static String CUSTOMER_STATE = "Florida";
 
-    @BeforeAll
-    public static void setup() {
-        signInPage = new SignInPage();
-        accountPage = new AccountPage();
+    @BeforeEach
+    public void setup() {
     }
 
     @AfterAll
     public static void cleanup() {
-        // WebDriverSingleton.getInstance().closeDriver();
+        WebDriverSingleton.getInstance().closeDriver();
     }
 
     @AfterEach
     public void logOut() {
+        signInPage = new SignInPage();
         signInPage.logout();
     }
 
@@ -51,19 +57,22 @@ public class LoginTest {
     @Test
     @Order(1)
     public void createAccountTest() {
+        signInPage = new SignInPage();
+        registrationPage = new RegistrationPage();
+        registrationUser = new RegistrationUser(CUSTOMER_FIRST_NAME,
+                CUSTOMER_LAST_NAME,
+                CUSTOMER_EMAIL,
+                CUSTOMER_PASSWORD,
+                CUSTOMER_ADDRESS,
+                CUSTOMER_CITY,
+                CUSTOMER_POST_CODE,
+                CUSTOMER_PHONE_MOBILE,
+                CUSTOMER_STATE);
+
         signInPage.openSignInPage()
                 .fillEmailAddress(CUSTOMER_EMAIL)
-                .openRegistrationPage()
-                .fillCustomerFirstName(CUSTOMER_FIRST_NAME)
-                .fillCustomerLastName(CUSTOMER_LAST_NAME)
-                .fillCustomerEmail(CUSTOMER_EMAIL)
-                .fillCustomerPassField(CUSTOMER_PASSWORD)
-                .fillCustomerAddress(CUSTOMER_ADDRESS)
-                .fillCustomerCity(CUSTOMER_CITY)
-                .choseState(3)
-                .fillCustomerPostCode(CUSTOMER_POST_CODE)
-                .fillCustomerMobilePhone(CUSTOMER_PHONE_MOBILE)
-                .submitAccount();
+                .openRegistrationPage();
+        registrationPage.register(registrationUser);
 
         assertEquals(CUSTOMER_FIRST_NAME + " " + CUSTOMER_LAST_NAME, signInPage.getCustomerName());
     }
@@ -75,11 +84,12 @@ public class LoginTest {
     @Test
     @Order(2)
     public void loginToAppTest() {
+        signInPage = new SignInPage();
         signInPage.openSignInPage()
                 .fillEmailAndPassword(USER_EMAIL, USER_PASSWORD)
                 .logInToApp();
 
-        assertEquals(USER_NAME, accountPage.getCustomerName());
+        assertEquals(USER_NAME, signInPage.getCustomerName());
     }
 }
 
