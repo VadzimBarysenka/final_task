@@ -10,15 +10,14 @@ import org.openqa.selenium.TakesScreenshot;
 
 public class TestListener implements TestWatcher {
 
-    @Override
-    public void testFailed(ExtensionContext context, Throwable throwable) {
-
-        Allure.getLifecycle().addAttachment(
-                "Screenshot for failure",
-                "image/png", "png",
-                ((TakesScreenshot) WebDriverSingleton.getInstance().getDriver()).getScreenshotAs(OutputType.BYTES)
-        );
-    }
+  @Override
+  public void testFailed(ExtensionContext context, Throwable throwable) {
+    Allure.getLifecycle().addAttachment(
+        "Screenshot for failure",
+        "image/png", "png",
+        ((TakesScreenshot) WebDriverSingleton.getInstance().getDriver()).getScreenshotAs(OutputType.BYTES)
+    );
+  }
 }
 
 

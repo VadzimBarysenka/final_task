@@ -6,12 +6,12 @@ import org.openqa.selenium.support.FindBy;
 
 public class AccountPage extends BasicPage {
 
-    @FindBy(xpath = "//a[@title='My wishlists']")
-    private WebElement wishList;
+  @FindBy(xpath = "//a[@title='My wishlists']")
+  private WebElement wishList;
 
-    @Step("Open [My wishlists] page")
-    public WishListPage openWishLists() {
-        wishList.click();
-        return new WishListPage();
-    }
+  @Step("Open [My wishlists] page")
+  public WishListPage openWishLists() {
+    wishList.click();
+    return new WishListPage();
+  }
 }

@@ -1,9 +1,11 @@
 package com.automationpractice;
 
 import com.automationpractice.Driver.WebDriverSingleton;
+import com.automationpractice.Pages.BasicPage;
 import com.automationpractice.Pages.CartPage;
 import com.automationpractice.Pages.ProductsPage;
 import com.automationpractice.Pages.SignInPage;
+import com.automationpractice.TestListener.PropertiesReader;
 import com.automationpractice.TestListener.TestListener;
 import io.qameta.allure.Description;
 import io.qameta.allure.Story;
@@ -11,58 +13,69 @@ import io.qameta.allure.TmsLink;
 import org.apache.commons.math3.util.Precision;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-//@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.CONCURRENT)
 @DisplayName("Cart functionality")
 @ExtendWith(TestListener.class)
 public class CartTest {
-    private SignInPage signInPage;
-    private CartPage cartPage;
-    private final static String USER_EMAIL = "testo@mail.com";
-    private final static String USER_PASSWORD = "!QAZxsw2";
+  private final static String USER_EMAIL = PropertiesReader.get("user.mail");
+  private final static String USER_PASSWORD = PropertiesReader.get("user.password");
+  private final static int EXP_QNT_PRODUCTS = 3;
+  private final static int PRODUCT_1 = 3;
+  private final static int PRODUCT_2 = 4;
+  private final static int PRODUCT_3 = 2;
 
-    @BeforeEach
-    public void setup() {
-    }
+  @AfterEach
+  public void cleanAndLogout() {
+    CartPage cartPage = new CartPage();
+    cartPage.cleanCart();
+    cartPage.logout();
+  }
 
-    @AfterEach
-    public void cleanAndLogout() {
-        cartPage = new CartPage();
-        cartPage.cleanCart();
-        signInPage.logout();
-    }
+  @AfterAll
+  public static void cleanup() {
+    WebDriverSingleton.getInstance().closeDriver();
+  }
 
-    @AfterAll
-    public static void cleanup() {
-        WebDriverSingleton.getInstance().closeDriver();
-    }
+  @Execution(ExecutionMode.SAME_THREAD)
+  @Story("Add product to cart form quick view")
+  @Description("Verify that user is able to add product to Cart from quick view")
+  @DisplayName("Verify add to cart from quick view")
+  @TmsLink("ID-103")
+  @Test
+  public void addToCartTest() {
+    SignInPage signInPage = new SignInPage();
+    signInPage.openSignInPage().fillEmailAndPassword(USER_EMAIL, USER_PASSWORD).logInToApp();
+    ProductsPage productsPage = signInPage.openCategory(BasicPage.Category.WOMEN)
+        .addProductToCartAndContinue(PRODUCT_1)
+        .openCategory(BasicPage.Category.DRESS)
+        .addProductToCartAndContinue(PRODUCT_2)
+        .addProductToCartAndContinue(PRODUCT_3);
+    CartPage cartPage = productsPage.openCart();
 
-    @Story("Add product to cart form quick view")
-    @Description("Verify that user is able to add product to Cart from quick view")
-    @DisplayName("Verify add to cart from quick view")
-    @TmsLink("ID-103")
-    @Test
-    public void addToCartTest() {
-        signInPage = new SignInPage();
-        signInPage.openSignInPage()
-                .fillEmailAndPassword(USER_EMAIL, USER_PASSWORD)
-                .logInToApp()
-                .openCategory("women")
-                .addProductToCartAndContinue(3)
-                .openCategory("dress")
-                .addProductToCartAndContinue(2)
-                .openCategory("t_shirts")
-                .addProductToCartAndContinue(1);
+    double expectedTotal = Precision.round(productsPage.getCartSum(), 2);
+    assertAll(
+        () -> assertEquals(expectedTotal, cartPage.getTotalWithoutTax()),
+        () -> assertEquals(EXP_QNT_PRODUCTS, cartPage.getSumProductQnt())
+    );
+  }
 
-        cartPage = new CartPage();
-        cartPage.openCart();
+  @Test
+  public void addToCartTestTwo() {
+    SignInPage signInPage = new SignInPage();
+    signInPage.openSignInPage().fillEmailAndPassword(USER_EMAIL, USER_PASSWORD).logInToApp();
+    ProductsPage productsPage = signInPage.openCategory(BasicPage.Category.WOMEN)
+        .addProductToCartAndContinue(PRODUCT_1)
+        .addProductToCartAndContinue(PRODUCT_2);
+    CartPage cartPage = productsPage.openCart();
+    double expectedTotal = Precision.round(productsPage.getCartSum(), 2);
 
-        assertAll(
-                () -> assertEquals(Precision.round(ProductsPage.getCartSum(), 2), cartPage.getTotalWithoutTax()),
-                () -> assertEquals(3, cartPage.getSumProductQnt())
-        );
-    }
+    Assertions.assertEquals(expectedTotal, cartPage.getTotalWithoutTax());
+
+  }
 }
